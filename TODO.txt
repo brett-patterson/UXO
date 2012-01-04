@@ -1,0 +1,3 @@
+outcomes of dialog button presses
+zooming
+"beating a level"

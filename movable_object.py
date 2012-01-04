@@ -4,8 +4,9 @@ from util.util import load_image
 from footsteps import Footsteps
 
 class MovableObject(QGraphicsItem):
-    def __init__(self, x, y, image_name):
+    def __init__(self, parent, x, y, image_name):
         QGraphicsItem.__init__(self)
+        self.parent = parent
         self.x = x
         self.y = y
         self.setPos(x,y)
@@ -14,6 +15,7 @@ class MovableObject(QGraphicsItem):
         self.image_name = image_name
         self.vertorhor = None
         self.setZValue(10)
+        self.footsteps = 0
 
     def boundingRect(self):
         return QRectF(0, 0, 84, 84)
@@ -55,19 +57,6 @@ class MovableObject(QGraphicsItem):
                 self.vertorhor = 1
 
         if self.direction != None:
-            if self.direction == 90:
-                f_x = self.x-42
-                f_y = self.y
-            elif self.direction == 180:
-                f_x = self.x
-                f_y = self.y-42
-            elif self.direction == 270:
-                f_x = self.x+42
-                f_y = self.y
-            elif self.direction == 0:
-                f_x = self.x
-                f_y = self.y+42
-
             f = Footsteps(self.x, self.y, self.direction, self.footstep_direction)
             self.scene().addItem(f)
             if self.footstep_direction == 0:
@@ -75,10 +64,11 @@ class MovableObject(QGraphicsItem):
             elif self.footstep_direction == 1:
                 self.footstep_direction = 0
 
-    def mousePressEvent(self, event):
-        button = event.button()
-        if button == Qt.LeftButton and self.boundingRect().contains(event.pos()):
-            menu = QMenu()
-            menu.addAction("HERRO")
-            menu.exec_(event.screenPos())
+            self.footsteps += 1
 
+            if self.footsteps == 5:
+                self.parent.createUXOPopup()
+                self.footsteps = 0
+                
+
+            
