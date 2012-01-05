@@ -3,7 +3,7 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from main_window import Ui_UXO
 from preferences import Ui_dialogPreferences
-from uxo_dialog import Ui_uxo_dialog
+from uxo_dialog_edited import Ui_uxo_dialog
 from movable_object import MovableObject
 from util.uxo_objects import UXO_OBJECTS, USED_OBJECTS
 from util import util
@@ -21,6 +21,7 @@ class Start(QMainWindow):
 
         QObject.connect(self.ui.actionNew_Game, SIGNAL("triggered()"), self, SLOT("newGame()"))
         QObject.connect(self.ui.actionPreferences, SIGNAL("triggered()"), self, SLOT("showPreferencesDialog()"))
+        self.zoomCounter = 0
 
     def populateScene(self):
         s = QGraphicsScene(QRectF(0,0, self.ui.graphicsView.width(), self.ui.graphicsView.height()))
@@ -34,13 +35,15 @@ class Start(QMainWindow):
         self.uxo_popup = QDialog()
         u = Ui_uxo_dialog()
         u.setupUi(self.uxo_popup)
+        self.uxo_popup.imageLabel = u.imageLabel
+        self.uxo_popup.scrollArea = u.scrollArea
         
         i = random.randint(0, len(UXO_OBJECTS)-1)
         while i in USED_OBJECTS:
             i = random.randint(0, len(UXO_OBJECTS)-1)
 
         USED_OBJECTS.append(i)
-        u.imageLabel.setPixmap(util.load_uxo_pixmap(UXO_OBJECTS[i][0]))
+        self.uxo_popup.imageLabel.setPixmap(util.load_uxo_pixmap(UXO_OBJECTS[i][0]))
         self.uxo_popup.correctAnswer = UXO_OBJECTS[i][1]
 
         self.uxo_popup.setWindowFlags(Qt.FramelessWindowHint)
@@ -53,6 +56,7 @@ class Start(QMainWindow):
         QObject.connect(u.buttonNotSafe, SIGNAL("clicked()"), self, SLOT("notSafeSelected()"))
         QObject.connect(u.buttonZoom, SIGNAL("clicked()"), self, SLOT("zoom()"))
 
+        self.zoomCounter = 0
         self.uxo_popup.exec_()
     
     @pyqtSlot()
@@ -67,7 +71,40 @@ class Start(QMainWindow):
 
     @pyqtSlot()
     def zoom(self):
-        print "zoom"
+        if self.zoomCounter < 4:
+            pixmap = self.uxo_popup.imageLabel.pixmap()
+            scaled_pixmap = pixmap.scaled(pixmap.width()*1.25, pixmap.height()*1.5)
+            self.uxo_popup.imageLabel.setPixmap(scaled_pixmap)
+            self.uxo_popup.imageLabel.resize(scaled_pixmap.size())
+            
+            self.zoomCounter += 1
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Danger!")
+            msg.setText("Careful! Do not go any closer! Please make your decision within 10 seconds.")
+            msg.exec_()
+            self.startTimer()
+
+    def startTimer(self):
+        self.timerCount = 9
+        self.timer = QTimer(self)
+        QObject.connect(self.timer, SIGNAL("timeout()"), self, SLOT("updateTimer()"))
+
+        self.timerLabel = QLabel("10", self)
+        self.timerLabel.setStyleSheet("QLabel {color: red; font-size: 1.5em;}")
+        self.timerLabel.move(QPoint(300, 300))
+        self.timer.start(1000)
+
+    @pyqtSlot()
+    def updateTimer(self):
+        self.timerLabel.setText(str(self.timerCount))
+        if self.timerCount > 0:
+            self.timerCount -= 1
+        else:
+            self.uxo_popup.close()
+            self.newGame()
+            self.timer.stop()
 
     @pyqtSlot()
     def newGame(self):

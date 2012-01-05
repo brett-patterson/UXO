@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-
 # Form implementation generated from reading ui file 'uxo_dialog.ui'
 #
-# Created: Tue Jan 03 20:35:01 2012
+# Created: Wed Jan 04 22:07:35 2012
 #      by: PyQt4 UI code generator 4.8.6
-#
-# WARNING! All changes made in this file will be lost!
+
+
+"""
+CUSTOM EDITS INSIDE!!!!!
+BE VERY CAREFUL WHEN GENERATING A NEW .PY FILE FROM .UI
+"""
 
 from PyQt4 import QtCore, QtGui
 
@@ -36,11 +39,6 @@ class Ui_uxo_dialog(object):
         self.buttonNotSafe.setIcon(icon1)
         self.buttonNotSafe.setIconSize(QtCore.QSize(32, 32))
         self.buttonNotSafe.setObjectName(_fromUtf8("buttonNotSafe"))
-        self.imageLabel = QtGui.QLabel(uxo_dialog)
-        self.imageLabel.setGeometry(QtCore.QRect(15, 70, 371, 261))
-        self.imageLabel.setText(_fromUtf8(""))
-        self.imageLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.imageLabel.setObjectName(_fromUtf8("imageLabel"))
         self.buttonZoom = QtGui.QPushButton(uxo_dialog)
         self.buttonZoom.setGeometry(QtCore.QRect(175, 340, 51, 41))
         self.buttonZoom.setText(_fromUtf8(""))
@@ -63,6 +61,18 @@ class Ui_uxo_dialog(object):
         self.label_2.setFont(font)
         self.label_2.setText(QtGui.QApplication.translate("uxo_dialog", "Is it safe?", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.scrollArea = QtGui.QScrollArea(uxo_dialog)
+        self.scrollArea.setGeometry(QtCore.QRect(10, 60, 381, 271))
+        self.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
+        self.imageLabel = QtGui.QLabel()
+        self.imageLabel.setGeometry(QtCore.QRect(0, 0, 361, 251))
+        self.imageLabel.setText(_fromUtf8(""))
+        self.imageLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.imageLabel.setObjectName(_fromUtf8("imageLabel"))
+        self.scrollArea.setWidget(self.imageLabel)
 
         self.retranslateUi(uxo_dialog)
         QtCore.QMetaObject.connectSlotsByName(uxo_dialog)
