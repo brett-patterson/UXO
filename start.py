@@ -61,17 +61,39 @@ class Start(QMainWindow):
     
     @pyqtSlot()
     def safeSelected(self):
-        print "safe"
+        if self.uxo_popup.correctAnswer == "s":
+            msg = QMessageBox()
+            msg.setWindowTitle("Correct!")
+            msg.setText("Nice job! This object is safe.")
+            msg.exec_()
+        else:
+            self.uxo_popup.close()
+            self.newGame()
+
         self.uxo_popup.close()
+        if hasattr(self, 'timer'):
+            self.timer.stop()
 
     @pyqtSlot()
     def notSafeSelected(self):
-        print "not safe"
+        if self.uxo_popup.correctAnswer == "ns":
+            msg = QMessageBox()
+            msg.setWindowTitle("Correct!")
+            msg.setText("Good work! This object is VERY dangerous. Be sure to report it to your local authorities.")
+            msg.exec_()
+        else:
+            msg = QMessageBox()
+            msg.setWindowTitle("Sorry!")
+            msg.setText("Actually, this object is not dangerous. Better safe than sorry, though!")
+            msg.exec_()
+
         self.uxo_popup.close()
+        if hasattr(self, 'timer'):
+            self.timer.stop()
 
     @pyqtSlot()
     def zoom(self):
-        if self.zoomCounter < 4:
+        if self.zoomCounter < 3:
             pixmap = self.uxo_popup.imageLabel.pixmap()
             scaled_pixmap = pixmap.scaled(pixmap.width()*1.25, pixmap.height()*1.5)
             self.uxo_popup.imageLabel.setPixmap(scaled_pixmap)
@@ -90,10 +112,6 @@ class Start(QMainWindow):
         self.timerCount = 9
         self.timer = QTimer(self)
         QObject.connect(self.timer, SIGNAL("timeout()"), self, SLOT("updateTimer()"))
-
-        self.timerLabel = QLabel("10", self)
-        self.timerLabel.setStyleSheet("QLabel {color: red; font-size: 1.5em;}")
-        self.timerLabel.move(QPoint(300, 300))
         self.timer.start(1000)
 
     @pyqtSlot()
