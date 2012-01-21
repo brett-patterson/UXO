@@ -15,7 +15,7 @@ class Start(QMainWindow):
         self.ui = Ui_UXO()
         self.ui.setupUi(self)
 
-        self.ui.graphicsView.setGeometry(0,0,800,600)
+        self.ui.graphicsView.setGeometry(0,0,self.size().width(),self.size().height())
         scene = self.populateScene()
         self.ui.graphicsView.setScene(scene)
 
@@ -48,7 +48,7 @@ class Start(QMainWindow):
 
         self.uxo_popup.setWindowFlags(Qt.FramelessWindowHint)
         p = self.ui.centralwidget.mapToGlobal(self.uxo_popup.pos())
-        self.uxo_popup.setGeometry(p.x()+self.uxo_popup.width()/2,
+        self.uxo_popup.setGeometry(p.x()+self.ui.graphicsView.width()/2-self.uxo_popup.width()/2,
              p.y()+self.ui.graphicsView.height()/2-self.uxo_popup.height()/2,
              self.uxo_popup.width(), self.uxo_popup.height())
 
@@ -116,7 +116,6 @@ class Start(QMainWindow):
 
     @pyqtSlot()
     def updateTimer(self):
-        self.timerLabel.setText(str(self.timerCount))
         if self.timerCount > 0:
             self.timerCount -= 1
         else:
@@ -126,6 +125,7 @@ class Start(QMainWindow):
 
     @pyqtSlot()
     def newGame(self):
+        self.ui.graphicsView.setGeometry(0,0,self.size().width(),self.size().height())
         self.ui.graphicsView.setScene(self.populateScene())
         
     @pyqtSlot()

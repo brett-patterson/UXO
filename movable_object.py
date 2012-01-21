@@ -49,6 +49,12 @@ class MovableObject(QGraphicsItem):
                 self.setY(self.y)
                 self.direction = 0
                 self.vertorhor = None
+            else:
+                msg = QMessageBox()
+                msg.setWindowTitle("Congratulations!")
+                msg.setText("Good work! You made it home!")
+                msg.exec_()
+                self.parent.newGame()
         elif (event.key() == Qt.Key_Down):
             if self.y < self.scene().height()-self.boundingRect().height()-2:
                 self.y += 35
