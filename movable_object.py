@@ -61,10 +61,12 @@ class MovableObject(QGraphicsItem):
                 self.setY(self.y)
                 self.direction = 180
                 self.vertorhor = 1
+        else:
+            return
 
         if self.direction != None:
             f = Footsteps(self.x, self.y, self.direction, self.footstep_direction)
-            self.scene().addItem(f)
+            self.parent.ui.graphicsView.scene().addItem(f)
             if self.footstep_direction == 0:
                 self.footstep_direction = 1
             elif self.footstep_direction == 1:
@@ -74,7 +76,4 @@ class MovableObject(QGraphicsItem):
 
             if self.footsteps == 5:
                 self.parent.createUXOPopup()
-                self.footsteps = 0
-                
-
-            
+                self.footsteps = 0 

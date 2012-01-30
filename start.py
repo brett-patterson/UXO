@@ -1,17 +1,18 @@
-import sys, random
+import sys, random, gc
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from main_window import Ui_UXO
 from preferences import Ui_dialogPreferences
 from uxo_dialog_edited import Ui_uxo_dialog
 from movable_object import MovableObject
-from util.uxo_objects import UXO_OBJECTS, USED_OBJECTS
+from util.uxo_objects import UXO_OBJECTS
 from util import util
 
 class Start(QMainWindow):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
- 
+        self.used_objects = []
+
         self.ui = Ui_UXO()
         self.ui.setupUi(self)
 
@@ -37,24 +38,28 @@ class Start(QMainWindow):
         u.setupUi(self.uxo_popup)
         self.uxo_popup.imageLabel = u.imageLabel
         self.uxo_popup.scrollArea = u.scrollArea
-        
-        i = random.randint(0, len(UXO_OBJECTS)-1)
-        while i in USED_OBJECTS:
-            i = random.randint(0, len(UXO_OBJECTS)-1)
-
-        USED_OBJECTS.append(i)
-        self.uxo_popup.imageLabel.setPixmap(util.load_uxo_pixmap(UXO_OBJECTS[i][0]))
-        self.uxo_popup.correctAnswer = UXO_OBJECTS[i][1]
-
+        QObject.connect(u.buttonSafe, SIGNAL("clicked()"), self, SLOT("safeSelected()"))
+        QObject.connect(u.buttonNotSafe, SIGNAL("clicked()"), self, SLOT("notSafeSelected()"))
+        QObject.connect(u.buttonZoom, SIGNAL("clicked()"), self, SLOT("zoom()"))
         self.uxo_popup.setWindowFlags(Qt.FramelessWindowHint)
+        self.uxo_popup.setAttribute(Qt.WA_DeleteOnClose)
         p = self.ui.centralwidget.mapToGlobal(self.uxo_popup.pos())
         self.uxo_popup.setGeometry(p.x()+self.ui.graphicsView.width()/2-self.uxo_popup.width()/2,
              p.y()+self.ui.graphicsView.height()/2-self.uxo_popup.height()/2,
              self.uxo_popup.width(), self.uxo_popup.height())
+        
+        i = random.randint(0, len(UXO_OBJECTS)-1)
+        while i in self.used_objects:
+            i = random.randint(0, len(UXO_OBJECTS)-1)
 
-        QObject.connect(u.buttonSafe, SIGNAL("clicked()"), self, SLOT("safeSelected()"))
-        QObject.connect(u.buttonNotSafe, SIGNAL("clicked()"), self, SLOT("notSafeSelected()"))
-        QObject.connect(u.buttonZoom, SIGNAL("clicked()"), self, SLOT("zoom()"))
+        self.used_objects.append(i)
+
+        pix = util.load_uxo_pixmap(UXO_OBJECTS[i][0])
+        pix = pix.scaled(pix.width()*0.4, pix.height()*0.4)
+        self.uxo_popup.imageLabel.setPixmap(pix)
+        self.uxo_popup.correctAnswer = UXO_OBJECTS[i][1]
+
+        
 
         self.zoomCounter = 0
         self.uxo_popup.exec_()
@@ -68,7 +73,7 @@ class Start(QMainWindow):
             msg.exec_()
         else:
             self.uxo_popup.close()
-            self.newGame()
+            self.startBlackoutTimer()
 
         self.uxo_popup.close()
         if hasattr(self, 'timer'):
@@ -93,9 +98,9 @@ class Start(QMainWindow):
 
     @pyqtSlot()
     def zoom(self):
-        if self.zoomCounter < 3:
+        if self.zoomCounter < 2:
             pixmap = self.uxo_popup.imageLabel.pixmap()
-            scaled_pixmap = pixmap.scaled(pixmap.width()*1.25, pixmap.height()*1.5)
+            scaled_pixmap = pixmap.scaled(pixmap.width()*1.25, pixmap.height()*1.25)
             self.uxo_popup.imageLabel.setPixmap(scaled_pixmap)
             self.uxo_popup.imageLabel.resize(scaled_pixmap.size())
             
@@ -114,19 +119,36 @@ class Start(QMainWindow):
         QObject.connect(self.timer, SIGNAL("timeout()"), self, SLOT("updateTimer()"))
         self.timer.start(1000)
 
+    def startBlackoutTimer(self):
+        s = QGraphicsScene(QRectF(0,0, self.ui.graphicsView.width(), self.ui.graphicsView.height()))
+        brush = QBrush(QColor("grey"))
+        s.setBackgroundBrush(brush)
+        self.ui.graphicsView.setScene(s)
+        self.blackout_timer = QTimer(self)
+        QObject.connect(self.blackout_timer, SIGNAL("timeout()"), self, SLOT("updateBlackoutTimer()"))
+        self.blackout_timer.setSingleShot(True)
+        self.blackout_timer.start(2000)
+
     @pyqtSlot()
     def updateTimer(self):
         if self.timerCount > 0:
             self.timerCount -= 1
         else:
             self.uxo_popup.close()
-            self.newGame()
+            self.startBlackoutTimer()
             self.timer.stop()
 
     @pyqtSlot()
+    def updateBlackoutTimer(self):
+        self.newGame()
+
+    @pyqtSlot()
     def newGame(self):
+        self.player = None
+        del self.used_objects[ 0:len(self.used_objects) ]
         self.ui.graphicsView.setGeometry(0,0,self.size().width(),self.size().height())
         self.ui.graphicsView.setScene(self.populateScene())
+        
         
     @pyqtSlot()
     def showPreferencesDialog(self):

@@ -1,2 +1,0 @@
-outcomes of dialog button presses
-"beating a level"
