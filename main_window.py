@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created: Fri Dec 23 16:44:01 2011
+# Created: Fri Feb 03 00:16:07 2012
 #      by: PyQt4 UI code generator 4.8.6
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_UXO(object):
     def setupUi(self, UXO):
         UXO.setObjectName(_fromUtf8("UXO"))
-        UXO.resize(800, 600)
+        UXO.resize(600, 900)
         UXO.setWindowTitle(QtGui.QApplication.translate("UXO", "UXO", None, QtGui.QApplication.UnicodeUTF8))
         self.centralwidget = QtGui.QWidget(UXO)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
@@ -36,7 +36,7 @@ class Ui_UXO(object):
         self.verticalLayout.addWidget(self.graphicsView)
         UXO.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(UXO)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 600, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setTitle(QtGui.QApplication.translate("UXO", "File", None, QtGui.QApplication.UnicodeUTF8))

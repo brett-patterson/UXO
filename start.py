@@ -26,9 +26,9 @@ class Start(QMainWindow):
 
     def populateScene(self):
         s = QGraphicsScene(QRectF(0,0, self.ui.graphicsView.width(), self.ui.graphicsView.height()))
-        self.player = MovableObject(self, 285, 550, None)
+        self.player = MovableObject(self, 270, 750, None)
         s.addItem(self.player)
-        s.addPixmap(QPixmap("res/img/back_1.png"))
+        s.addPixmap(QPixmap("res/img/bg.png"))
         self.player.grabKeyboard()
         return s
 
