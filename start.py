@@ -100,7 +100,7 @@ class Start(QMainWindow):
     def zoom(self):
         if self.zoomCounter < 2:
             pixmap = self.uxo_popup.imageLabel.pixmap()
-            scaled_pixmap = pixmap.scaled(pixmap.width()*1.25, pixmap.height()*1.25)
+            scaled_pixmap = pixmap.scaled(pixmap.width()*1.4, pixmap.height()*1.4)
             self.uxo_popup.imageLabel.setPixmap(scaled_pixmap)
             self.uxo_popup.imageLabel.resize(scaled_pixmap.size())
             
