@@ -1,4 +1,4 @@
-import sys, random, gc
+import sys, random
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from main_window import Ui_UXO
@@ -9,9 +9,18 @@ from util.uxo_objects import UXO_OBJECTS
 from util import util
 
 class Start(QMainWindow):
+    """
+    Main application
+    """
     def __init__(self, parent=None):
+        """
+        Initialize ui from Qt Designer file, and connect file menu items
+        """
         QWidget.__init__(self, parent)
-        self.used_objects = []
+
+        # used_objects keeps track of all uxo objects that have appeared
+        # to prevent repeats
+        self.used_objects = [] 
 
         self.ui = Ui_UXO()
         self.ui.setupUi(self)
@@ -22,17 +31,25 @@ class Start(QMainWindow):
 
         QObject.connect(self.ui.actionNew_Game, SIGNAL("triggered()"), self, SLOT("newGame()"))
         QObject.connect(self.ui.actionPreferences, SIGNAL("triggered()"), self, SLOT("showPreferencesDialog()"))
+
+        # level of zoom
         self.zoomCounter = 0
 
     def populateScene(self):
+        """
+        Generates a new scene with the background and a player object
+        """
         s = QGraphicsScene(QRectF(0,0, self.ui.graphicsView.width(), self.ui.graphicsView.height()))
         self.player = MovableObject(self, 270, 750, None)
         s.addItem(self.player)
         s.addPixmap(QPixmap("res/img/bg.png"))
-        self.player.grabKeyboard()
+        self.player.grabKeyboard() # set player to receive all keyboard events
         return s
 
     def createUXOPopup(self):
+        """
+        Creates a zoomable dialog with buttons for safe and not safe
+        """
         self.uxo_popup = QDialog()
         u = Ui_uxo_dialog()
         u.setupUi(self.uxo_popup)
@@ -41,31 +58,45 @@ class Start(QMainWindow):
         QObject.connect(u.buttonSafe, SIGNAL("clicked()"), self, SLOT("safeSelected()"))
         QObject.connect(u.buttonNotSafe, SIGNAL("clicked()"), self, SLOT("notSafeSelected()"))
         QObject.connect(u.buttonZoom, SIGNAL("clicked()"), self, SLOT("zoom()"))
-        self.uxo_popup.setWindowFlags(Qt.FramelessWindowHint)
+        
+        # set the object to have no Windows title bar and 
+        # delete from memory when closed
+        self.uxo_popup.setWindowFlags(Qt.FramelessWindowHint) 
         self.uxo_popup.setAttribute(Qt.WA_DeleteOnClose)
+
+        # convert coordinates of the dialog to be relative to the entire screen,
+        # not just the application
         p = self.ui.centralwidget.mapToGlobal(self.uxo_popup.pos())
         self.uxo_popup.setGeometry(p.x()+self.ui.graphicsView.width()/2-self.uxo_popup.width()/2,
              p.y()+self.ui.graphicsView.height()/2-self.uxo_popup.height()/2,
              self.uxo_popup.width(), self.uxo_popup.height())
         
+        # pick a random object from the list of objects and ensure that it
+        # has not already been displayed
         i = random.randint(0, len(UXO_OBJECTS)-1)
         while i in self.used_objects:
             i = random.randint(0, len(UXO_OBJECTS)-1)
 
         self.used_objects.append(i)
 
+        # scale the image to a smaller size
         pix = util.load_uxo_pixmap(UXO_OBJECTS[i][0])
         pix = pix.scaled(pix.width()*0.4, pix.height()*0.4)
         self.uxo_popup.imageLabel.setPixmap(pix)
         self.uxo_popup.correctAnswer = UXO_OBJECTS[i][1]
 
         
-
+        # reset zoom and display
         self.zoomCounter = 0
         self.uxo_popup.exec_()
     
     @pyqtSlot()
     def safeSelected(self):
+        """
+        Called when the safe button on the dialog popup is selected. If the
+        object is safe, congratulate the user. If it is not safe, display no
+        message, turn the screen black, and restart the game.
+        """
         if self.uxo_popup.correctAnswer == "s":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
@@ -81,6 +112,11 @@ class Start(QMainWindow):
 
     @pyqtSlot()
     def notSafeSelected(self):
+        """
+        Called when the not safe button on the dialog popup is selected. If the
+        object isn't safe, congratulate the user. If it is safe, alert them that
+        it is a safe object, but allow them to keep playing.
+        """
         if self.uxo_popup.correctAnswer == "ns":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
@@ -98,9 +134,13 @@ class Start(QMainWindow):
 
     @pyqtSlot()
     def zoom(self):
+        """
+        Zoom in on the image of the uxo. After 3 zooms, the zoom resets to
+        the original scale factor.
+        """
         if self.zoomCounter < 2:
             pixmap = self.uxo_popup.imageLabel.pixmap()
-            scaled_pixmap = pixmap.scaled(pixmap.width()*1.4, pixmap.height()*1.4)
+            scaled_pixmap = pixmap.scaled(pixmap.width()*1.45, pixmap.height()*1.45)
             self.uxo_popup.imageLabel.setPixmap(scaled_pixmap)
             self.uxo_popup.imageLabel.resize(scaled_pixmap.size())
             
@@ -114,12 +154,18 @@ class Start(QMainWindow):
             self.startTimer()
 
     def startTimer(self):
+        """
+        Called when the user zooms 3 times on the uxo dialog.
+        """
         self.timerCount = 9
         self.timer = QTimer(self)
         QObject.connect(self.timer, SIGNAL("timeout()"), self, SLOT("updateTimer()"))
         self.timer.start(1000)
 
     def startBlackoutTimer(self):
+        """
+        Called when the user selects safe on a not safe uxo.
+        """
         s = QGraphicsScene(QRectF(0,0, self.ui.graphicsView.width(), self.ui.graphicsView.height()))
         brush = QBrush(QColor("grey"))
         s.setBackgroundBrush(brush)
@@ -152,6 +198,9 @@ class Start(QMainWindow):
         
     @pyqtSlot()
     def showPreferencesDialog(self):
+        """
+        Preferences dialog not implemented (blank).
+        """
         self.preferences = QDialog()
         p = Ui_dialogPreferences()
         p.setupUi(self.preferences)

@@ -26,7 +26,7 @@ class Footsteps(QGraphicsItem):
         transform = QTransform().rotate(self.direction)
         image = image.transformed(transform)
         
-        
+        # rotates images relative to the player's turns
         if self.footstep_direction == 1 and self.direction == 90:
             draw_x = 0
             draw_y = 25

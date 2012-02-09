@@ -10,10 +10,10 @@ class MovableObject(QGraphicsItem):
         self.x = x
         self.y = y
         self.setPos(x,y)
-        self.direction = None
-        self.footstep_direction = 0
+        self.direction = None # rotation of footsteps
+        self.footstep_direction = 0 # 0 is left foot, 1 is right foot
         self.image_name = image_name
-        self.vertorhor = None
+        self.vertorhor = None # moving horizontally or vertically
         self.setZValue(10)
         self.footsteps = 0
 
@@ -21,6 +21,7 @@ class MovableObject(QGraphicsItem):
         return QRectF(0, 0, 84, 84)
 
     def paint(self, painter, option, widget):
+        # draws image with offset for aesthetics
         if self.image_name is not None:
             image = load_image(self.image_name)
             if self.vertorhor == None:
@@ -50,6 +51,7 @@ class MovableObject(QGraphicsItem):
                 self.direction = 0
                 self.vertorhor = None
             else:
+                # user has reached the top of the screen
                 msg = QMessageBox()
                 msg.setWindowTitle("Congratulations!")
                 msg.setText("Good work! You made it home!")
@@ -65,8 +67,10 @@ class MovableObject(QGraphicsItem):
             return
 
         if self.direction != None:
+            # put down footsteps behind the player
             f = Footsteps(self.x, self.y, self.direction, self.footstep_direction)
             self.parent.ui.graphicsView.scene().addItem(f)
+            # switch feet
             if self.footstep_direction == 0:
                 self.footstep_direction = 1
             elif self.footstep_direction == 1:
@@ -74,6 +78,7 @@ class MovableObject(QGraphicsItem):
 
             self.footsteps += 1
 
+            # create a dialog every 5 steps
             if self.footsteps == 5:
                 self.parent.createUXOPopup()
                 self.footsteps = 0 
