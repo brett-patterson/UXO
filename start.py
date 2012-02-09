@@ -100,7 +100,7 @@ class Start(QMainWindow):
         if self.uxo_popup.correctAnswer == "s":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
-            msg.setText("Nice job! This object is safe.")
+            msg.setText("It’s not danger, you can take it.")
             msg.exec_()
         else:
             self.uxo_popup.close()
@@ -120,12 +120,12 @@ class Start(QMainWindow):
         if self.uxo_popup.correctAnswer == "ns":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
-            msg.setText("Good work! This object is VERY dangerous. Be sure to report it to your local authorities.")
+            msg.setText("Child, go to the village leader’s house and tell him about bomb.")
             msg.exec_()
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Sorry!")
-            msg.setText("Actually, this object is not dangerous. Better safe than sorry, though!")
+            msg.setText("Young kid, its not danger.  Young kid can keep it.")
             msg.exec_()
 
         self.uxo_popup.close()
@@ -149,7 +149,7 @@ class Start(QMainWindow):
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setWindowTitle("Danger!")
-            msg.setText("Careful! Do not go any closer! Please make your decision within 10 seconds.")
+            msg.setText("Child, walk away carefully because it may be bomb! Decide quickly!")
             msg.exec_()
             self.startTimer()
 

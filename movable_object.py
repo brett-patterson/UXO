@@ -54,7 +54,7 @@ class MovableObject(QGraphicsItem):
                 # user has reached the top of the screen
                 msg = QMessageBox()
                 msg.setWindowTitle("Congratulations!")
-                msg.setText("Good work! You made it home!")
+                msg.setText("Mommy very happy that child come home safe")
                 msg.exec_()
                 self.parent.newGame()
         elif (event.key() == Qt.Key_Down):
