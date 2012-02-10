@@ -100,7 +100,7 @@ class Start(QMainWindow):
         if self.uxo_popup.correctAnswer == "s":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
-            msg.setText("It’s not danger, you can take it.")
+            msg.setText("It's not danger, you can take it.")
             msg.exec_()
         else:
             self.uxo_popup.close()
@@ -120,7 +120,7 @@ class Start(QMainWindow):
         if self.uxo_popup.correctAnswer == "ns":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
-            msg.setText("Child, go to the village leader’s house and tell him about bomb.")
+            msg.setText("Child, go to the village leader's house and tell him about bomb.")
             msg.exec_()
         else:
             msg = QMessageBox()
