@@ -5,7 +5,7 @@ import py2exe, sys, os, shutil
 sys.path.append("VSFILES")
 data = [("Microsoft.VC90.CRT", glob(r'VSFILES\*.*'))]
 
-setup(console=['start.py'],
+setup(windows=['start.py'],
       data_files=data,
       options={"py2exe":{"includes":["sip"]}},
       name="UXO",
