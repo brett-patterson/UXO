@@ -100,11 +100,11 @@ class Start(QMainWindow):
         if self.uxo_popup.correctAnswer == "s":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
-            msg.setText("It's not danger, you can take it.")
+            msg.setText("Specialist voice in local dialect: It's not danger, you can take it.")
             msg.exec_()
         else:
             self.uxo_popup.close()
-            self.startBlackoutTimer()
+            self.startBlackout()
 
         self.uxo_popup.close()
         if hasattr(self, 'timer'):
@@ -120,12 +120,12 @@ class Start(QMainWindow):
         if self.uxo_popup.correctAnswer == "ns":
             msg = QMessageBox()
             msg.setWindowTitle("Correct!")
-            msg.setText("Child, go to the village leader's house and tell him about bomb.")
+            msg.setText("Specialist voice in local dialect: Child, go to the village leader's house and tell him about bomb.")
             msg.exec_()
         else:
             msg = QMessageBox()
             msg.setWindowTitle("Sorry!")
-            msg.setText("Young kid, its not danger.  Young kid can keep it.")
+            msg.setText("Specialist voice in local dialect: Young kid, its not danger.  Young kid can keep it.")
             msg.exec_()
 
         self.uxo_popup.close()
@@ -162,18 +162,22 @@ class Start(QMainWindow):
         QObject.connect(self.timer, SIGNAL("timeout()"), self, SLOT("updateTimer()"))
         self.timer.start(1000)
 
-    def startBlackoutTimer(self):
+    def startBlackout(self):
         """
         Called when the user selects safe on a not safe uxo.
         """
-        s = QGraphicsScene(QRectF(0,0, self.ui.graphicsView.width(), self.ui.graphicsView.height()))
-        brush = QBrush(QColor("grey"))
-        s.setBackgroundBrush(brush)
-        self.ui.graphicsView.setScene(s)
-        self.blackout_timer = QTimer(self)
-        QObject.connect(self.blackout_timer, SIGNAL("timeout()"), self, SLOT("updateBlackoutTimer()"))
-        self.blackout_timer.setSingleShot(True)
-        self.blackout_timer.start(2000)
+        print "starting blackout"
+        self.bgItem = QGraphicsRectItem(0,0,self.ui.graphicsView.scene().width(),self.ui.graphicsView.scene().height())
+        self.bgItem.setBrush(QBrush(QColor("grey")))
+        self.bgItem.setOpacity(0)
+        
+        self.ui.graphicsView.scene().addItem(self.bgItem)
+
+        self.timeline = QTimeLine(4000, self)
+        self.timeline.setFrameRange(0, 4000)
+        self.timeline.setUpdateInterval(1)
+        QObject.connect(self.timeline, SIGNAL("frameChanged(int)"), self, SLOT("updateBlackout(int)"))
+        self.timeline.start()
 
     @pyqtSlot()
     def updateTimer(self):
@@ -181,12 +185,19 @@ class Start(QMainWindow):
             self.timerCount -= 1
         else:
             self.uxo_popup.close()
-            self.startBlackoutTimer()
+            self.startBlackout()
             self.timer.stop()
 
-    @pyqtSlot()
-    def updateBlackoutTimer(self):
-        self.newGame()
+    @pyqtSlot(int)
+    def updateBlackout(self, frame):
+        self.bgItem.setOpacity(float(frame)/4000)
+        if frame == 4000:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Danger!")
+            msg.setText("Mother-voice in local dialect: Very bad that all village people, including young and old plus animals that got hurt because of this bomb.")
+            msg.exec_()
+            self.newGame()
 
     @pyqtSlot()
     def newGame(self):
